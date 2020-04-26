@@ -1,7 +1,8 @@
-# openstreetmap-tile-server
+# openstreetmap-tile-server-cyclosm
 
-[![Build Status](https://travis-ci.org/Overv/openstreetmap-tile-server.svg?branch=master)](https://travis-ci.org/Overv/openstreetmap-tile-server) [![](https://images.microbadger.com/badges/image/overv/openstreetmap-tile-server.svg)](https://microbadger.com/images/overv/openstreetmap-tile-server "openstreetmap-tile-server")
-[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/overv/openstreetmap-tile-server?label=docker%20image)](https://hub.docker.com/r/overv/openstreetmap-tile-server/tags)
+## Forked from [Overv/openstreetmap-tile-server](https://github.com/Overv/openstreetmap-tile-server)
+
+[![Build Status](https://github.com/Lezurex/openstreetmap-tile-server-cyclosm/workflows/Docker/badge.svg)](https://github.com/Lezurex/openstreetmap-tile-server-cyclosm/actions?query=workflow%3ADocker) [![](https://images.microbadger.com/badges/image/lezurex/openstreetmap-tile-server-cyclosm.svg)](https://microbadger.com/images/lezurex/openstreetmap-tile-server-cyclosm "openstreetmap-tile-server-cyclosm")
 
 This container allows you to easily set up an OpenStreetMap PNG tile server given a `.osm.pbf` file. It is based on the [latest Ubuntu 18.04 LTS guide](https://switch2osm.org/serving-tiles/manually-building-a-tile-server-18-04-lts/) from [switch2osm.org](https://switch2osm.org/) and therefore uses the default OpenStreetMap style.
 
@@ -17,7 +18,7 @@ Next, download an `.osm.pbf` extract from geofabrik.de for the region that you'r
 docker run \
     -v /absolute/path/to/luxembourg.osm.pbf:/data/region.osm.pbf \
     -v osm-data:/data/database/ \
-    overv/openstreetmap-tile-server \
+    lezurex/openstreetmap-tile-server-cyclosm \
     import
 ```
 
@@ -33,11 +34,12 @@ If your import is an extract of the planet and has polygonal bounds associated w
 
 ```
 docker run \
+    --rm \
     -e UPDATES=enabled \
     -v /absolute/path/to/luxembourg.osm.pbf:/data/region.osm.pbf \
     -v /absolute/path/to/luxembourg.poly:/data/region.poly \
     -v osm-data:/data/database/ \
-    overv/openstreetmap-tile-server \
+    Lezurex/openstreetmap-tile-server-cyclosm \
     import
 ```
 
@@ -52,10 +54,11 @@ It is also possible to let the container download files for you rather than moun
 
 ```
 docker run \
+    --rm \
     -e DOWNLOAD_PBF=https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf \
     -e DOWNLOAD_POLY=https://download.geofabrik.de/europe/luxembourg.poly \
     -v osm-data:/data/database/ \
-    overv/openstreetmap-tile-server \
+    lezurex/openstreetmap-tile-server-cyclosm \
     import
 ```
 
@@ -97,7 +100,7 @@ docker run \
     run
 ```
 
-Your tiles will now be available at `http://localhost:8080/tile/{z}/{x}/{y}.png`. The demo map in `leaflet-demo.html` will then be available on `http://localhost:8080`. Note that it will initially take quite a bit of time to render the larger tiles for the first time.
+Your tiles will now be available at `http://localhost:8080/tile/{z}/{x}/{y}.png`.
 
 ### Using Docker Compose
 
@@ -169,7 +172,7 @@ docker run \
     -p 8080:80 \
     -v osm-data:/data/database/ \
     -e ALLOW_CORS=enabled \
-    -d overv/openstreetmap-tile-server \
+    -d mhajder/openstreetmap-tile-server-cyclosm \
     run
 ```
 
@@ -278,7 +281,7 @@ docker run \
     -p 8080:80 \
     -v osm-data:/data/database/ \
     --shm-size="192m" \
-    -d overv/openstreetmap-tile-server \
+    -d mhajder/openstreetmap-tile-server-cyclosm \
     run
 ```
 For too high values you may notice excessive CPU load and memory usage. It might be that you will have to experimentally find the best values for yourself.
