@@ -4,7 +4,7 @@
 
 [![Build Status](https://github.com/Lezurex/openstreetmap-tile-server-cyclosm/workflows/Docker/badge.svg)](https://github.com/Lezurex/openstreetmap-tile-server-cyclosm/actions?query=workflow%3ADocker) [![](https://images.microbadger.com/badges/image/lezurex/openstreetmap-tile-server-cyclosm.svg)](https://microbadger.com/images/lezurex/openstreetmap-tile-server-cyclosm "openstreetmap-tile-server-cyclosm")
 
-This container allows you to easily set up an OpenStreetMap PNG tile server given a `.osm.pbf` file. It is based on the [latest Ubuntu 18.04 LTS guide](https://switch2osm.org/serving-tiles/manually-building-a-tile-server-18-04-lts/) from [switch2osm.org](https://switch2osm.org/) and therefore uses the default OpenStreetMap style.
+This container allows you to easily set up an OpenStreetMap PNG tile server given a `.osm.pbf` file. It is based on the [latest Ubuntu 18.04 LTS guide](https://switch2osm.org/serving-tiles/manually-building-a-tile-server-18-04-lts/) from [switch2osm.org](https://switch2osm.org/) and therefore uses the [CyclOSM](https://github.com/cyclosm/cyclosm-cartocss-style) style.
 
 ## Setting up the server
 
