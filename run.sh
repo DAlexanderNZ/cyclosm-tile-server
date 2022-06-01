@@ -121,6 +121,13 @@ if [ "$1" == "import" ]; then
         sudo -E -u renderer python3 /data/style/scripts/get-external-data.py -c /data/style/external-data.yml -D /data/style/data
     fi
 
+    # Import CyclOSM views
+    sudo -u postgres psql -d gis -f views.sql
+    sudo -u postgres psql -d gis -c "ALTER VIEW cyclosm_ways OWNER TO renderer;"
+    sudo -u postgres psql -d gis -c "ALTER VIEW cyclosm_amenities_point OWNER TO renderer;"
+    sudo -u postgres psql -d gis -c "ALTER VIEW cyclosm_amenities_poly OWNER TO renderer;"
+    sudo -u postgres psql -d gis -c "ALTER VIEW cyclosm_ways OWNER TO renderer;"
+
     # Register that data has changed for mod_tile caching purposes
     sudo -u renderer touch /data/database/planet-import-complete
 
