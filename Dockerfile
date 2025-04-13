@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 AS compiler-common
+FROM ubuntu:24.04 AS compiler-common
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
@@ -17,13 +17,21 @@ RUN apt-get update \
 
 FROM compiler-common AS compiler-stylesheet
 RUN cd ~ \
-&& git clone --single-branch --branch v5.4.0 https://github.com/gravitystorm/openstreetmap-carto.git --depth 1 \
+&& git clone --single-branch https://github.com/cyclosm/cyclosm-cartocss-style.git openstreetmap-carto \
 && cd openstreetmap-carto \
-&& sed -i 's/, "unifont Medium", "Unifont Upper Medium"//g' style/fonts.mss \
-&& sed -i 's/"Noto Sans Tibetan Regular",//g' style/fonts.mss \
-&& sed -i 's/"Noto Sans Tibetan Bold",//g' style/fonts.mss \
-&& sed -i 's/Noto Sans Syriac Eastern Regular/Noto Sans Syriac Regular/g' style/fonts.mss \
-&& rm -rf .git
+&& cp views.sql / \
+&& rm -rf .git \
+&& mkdir data \
+&& cd data \
+&& wget -O simplified-land-polygons.zip http://osmdata.openstreetmap.de/download/simplified-land-polygons-complete-3857.zip \
+&& wget -O land-polygons.zip http://osmdata.openstreetmap.de/download/land-polygons-split-3857.zip \
+&& unzip simplified-land-polygons.zip \
+&& unzip land-polygons.zip \
+&& rm *.zip \
+&& cd .. \
+&& sed -i 's/dbname: "osm"/dbname: "gis"/g' project.mml \
+&& sed -i 's,http://osmdata.openstreetmap.de/download/simplified-land-polygons-complete-3857.zip,data/simplified-land-polygons-complete-3857/simplified_land_polygons.shp,g' project.mml \
+&& sed -i 's,http://osmdata.openstreetmap.de/download/land-polygons-split-3857.zip,data/land-polygons-split-3857/land_polygons.shp,g' project.mml
 
 ###########################################################################################################
 
@@ -46,7 +54,7 @@ ENV AUTOVACUUM=on
 ENV UPDATES=disabled
 ENV REPLICATION_URL=https://planet.openstreetmap.org/replication/hour/
 ENV MAX_INTERVAL_SECONDS=3600
-ENV PG_VERSION 15
+ENV PG_VERSION 17
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
@@ -99,7 +107,8 @@ RUN wget https://github.com/stamen/terrain-classic/blob/master/fonts/unifont-Med
 RUN pip3 install \
  requests \
  osmium \
- pyyaml
+ pyyaml \
+ --break-system-packages
 
 # Install carto for stylesheet
 RUN npm install -g carto@1.2.0
@@ -115,7 +124,7 @@ RUN ln -sf /dev/stdout /var/log/apache2/access.log \
 # leaflet
 COPY leaflet-demo.html /var/www/html/index.html
 RUN cd /var/www/html/ \
-&& wget https://github.com/Leaflet/Leaflet/releases/download/v1.8.0/leaflet.zip \
+&& wget https://github.com/Leaflet/Leaflet/releases/download/v1.9.4/leaflet.zip \
 && unzip leaflet.zip \
 && rm leaflet.zip
 
