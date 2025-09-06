@@ -1,35 +1,49 @@
-# openstreetmap-tile-server-cyclosm
+# cyclosm-tile-server
 
-[![Build Status](https://travis-ci.org/Overv/openstreetmap-tile-server.svg?branch=master)](https://travis-ci.org/Overv/openstreetmap-tile-server) [![](https://images.microbadger.com/badges/image/overv/openstreetmap-tile-server.svg)](https://microbadger.com/images/overv/openstreetmap-tile-server "openstreetmap-tile-server")
-[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/overv/openstreetmap-tile-server?label=docker%20image)](https://hub.docker.com/r/overv/openstreetmap-tile-server/tags)
+## Forked from [Lezurex/openstreetmap-tile-server-cyclosm](https://github.com/Lezurex/openstreetmap-tile-server-cyclosm)
 
-## Forked from [Overv/openstreetmap-tile-server](https://github.com/Overv/openstreetmap-tile-server)
+This container allows you to easily set up an OpenStreetMap PNG tile server given a `.osm.pbf` file. It is based on the [Ubuntu 18.04 LTS guide](https://switch2osm.org/serving-tiles/manually-building-a-tile-server-18-04-lts/) from [switch2osm.org](https://switch2osm.org/) and therefore uses the [CyclOSM](https://github.com/cyclosm/cyclosm-cartocss-style) style.
 
-This container allows you to easily set up an OpenStreetMap PNG tile server given a `.osm.pbf` file. It is based on the [latest Ubuntu 18.04 LTS guide](https://switch2osm.org/serving-tiles/manually-building-a-tile-server-18-04-lts/) from [switch2osm.org](https://switch2osm.org/) and therefore uses the [CyclOSM](https://github.com/cyclosm/cyclosm-cartocss-style) style.
+It has been updated to use the Ubuntu 24.04 docker image in [ba0fdbb](https://github.com/DAlexanderNZ/cyclosm-tile-server/commit/ba0fdbb71a8dd287826aa921526229eac62ee411).
+
+This README has been adapted and updated from the orginal to remove dependence on pre-built docker images that I have found to not exist from previous forks at the time of writing. Instead the setup will guide you through building the image yourself locally.
 
 ## Setting up the server
 
-First create a Docker volume to hold the PostgreSQL database that will contain the OpenStreetMap data:
+1. Clone this repository:
+```
+git clone https://github.com/DAlexanderNZ/cyclosm-tile-server.git
+```
 
-    docker volume create osm-data
+2. Build the Docker image:
+```
+cd cyclosm-tile-server
+docker build -t cyclosm-tile-server -f Dockerfile .
+```
 
-Next, download an `.osm.pbf` extract from geofabrik.de for the region that you're interested in. You can then start importing it into PostgreSQL by running a container and mounting the file as `/data/region.osm.pbf`. For example:
+3. create a Docker volume to hold the PostgreSQL database that will contain the OpenStreetMap data:
+```
+docker volume create osm-data
+```
+
+4. Download an `.osm.pbf` extract from [geofabrik.de](https://download.geofabrik.de/) for the region that you're interested in. 
+
+5. Import your `.osm.pbf` file into PostgreSQL by running the `cyclosm-tile-server` container and mounting the file as `/data/region.osm.pbf`. For example:
 
 ```
 docker run \
-    -v /absolute/path/to/luxembourg.osm.pbf:/data/region.osm.pbf \
+    -v /absolute/path/to/your.osm.pbf:/data/region.osm.pbf \
     -v osm-data:/data/database/ \
-    lezurex/openstreetmap-tile-server-cyclosm \
-    import
+    cyclosm-tile-server import
 ```
 
 If the container exits without errors, then your data has been successfully imported and you are now ready to run the tile server.
 
 Note that the import process requires an internet connection. The run process does not require an internet connection. If you want to run the openstreetmap-tile server on a computer that is isolated, you must first import on an internet connected computer, export the `osm-data` volume as a tarfile, and then restore the data volume on the target computer system.
 
-Also when running on an isolated system, the default `index.html` from the container will not work, as it requires access to the web for the leaflet packages.
-
 ### Automatic updates (optional)
+[!IMPORTANT] 
+This section is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
 
 If your import is an extract of the planet and has polygonal bounds associated with it, like those from [geofabrik.de](https://download.geofabrik.de/), then it is possible to set your server up for automatic updates. Make sure to reference both the OSM file and the polygon file during the `import` process to facilitate this, and also include the `UPDATES=enabled` variable:
 
@@ -49,6 +63,9 @@ Please note: If you're not importing the whole planet, then the `.poly` file is 
 Therefore, when you only have a `.osm.pbf` file but not a `.poly` file, you should not enable automatic updates.
 
 ### Letting the container download the file
+[!IMPORTANT] 
+This section is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
+
 
 It is also possible to let the container download files for you rather than mounting them in advance by using the `DOWNLOAD_PBF` and `DOWNLOAD_POLY` parameters:
 
@@ -62,6 +79,8 @@ docker run \
 ```
 
 ### Using an alternate style
+[!IMPORTANT] 
+This section is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
 
 By default the container will use openstreetmap-carto if it is not specified. However, you can modify the style at run-time. Be aware you need the style mounted at `run` AND `import` as the Lua script needs to be run:
 
@@ -88,6 +107,17 @@ If you do not see the expected style upon `run` double check your paths as the s
 **Only openstreetmap-carto and styles like it, eg, ones with one lua script, one style, one mml, one SQL can be used**
 
 ## Running the server
+### Using Docker Compose
+
+The `docker-compose.yml` file included with this repository can be run after building the image, and import of `oms.pbf` file has been done. It also includes preservation of rendered tiles with `osm-tiles` volume as per the next section.
+
+```
+docker-compose up -d
+```
+
+### Manually using `docker run`
+[!NOTE]
+Rendering is done with [mod_tile](https://wiki.openstreetmap.org/wiki/Mod_tile) and apache2.    
 
 Run the server like this:
 
@@ -95,16 +125,13 @@ Run the server like this:
 docker run \
     -p 8080:80 \
     -v osm-data:/data/database/ \
-    -d lezurex/openstreetmap-tile-server \
+    -d cyclosm-tile-server \
     run
 ```
 
 Your tiles will now be available at `http://localhost:8080/tile/{z}/{x}/{y}.png`. The demo map in `leaflet-demo.html` will then be available on `http://localhost:8080`.
  Note that it will initially take quite a bit of time to render the larger tiles for the first time.
 
-### Using Docker Compose
-
-The `docker-compose.yml` file included with this repository shows how the aforementioned command can be used with Docker Compose to run your server.
 
 ### Preserving rendered tiles
 
@@ -116,13 +143,15 @@ docker run \
     -p 8080:80 \
     -v osm-data:/data/database/ \
     -v osm-tiles:/data/tiles/ \
-    -d lezurex/openstreetmap-tile-server \
+    -d cyclosm-tile-server \
     run
 ```
 
 **If you do this, then make sure to also run the import with the `osm-tiles` volume to make sure that caching works properly across updates!**
 
 ### Enabling automatic updating (optional)
+[!IMPORTANT] 
+From this section on is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
 
 Given that you've set up your import as described in the *Automatic updates* section during server setup, you can enable the updating process by setting the `UPDATES` variable while running your server as well:
 
