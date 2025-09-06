@@ -42,8 +42,8 @@ If the container exits without errors, then your data has been successfully impo
 Note that the import process requires an internet connection. The run process does not require an internet connection. If you want to run the openstreetmap-tile server on a computer that is isolated, you must first import on an internet connected computer, export the `osm-data` volume as a tarfile, and then restore the data volume on the target computer system.
 
 ### Automatic updates (optional)
-[!IMPORTANT] 
-This section is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
+>[!IMPORTANT] 
+>This section is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
 
 If your import is an extract of the planet and has polygonal bounds associated with it, like those from [geofabrik.de](https://download.geofabrik.de/), then it is possible to set your server up for automatic updates. Make sure to reference both the OSM file and the polygon file during the `import` process to facilitate this, and also include the `UPDATES=enabled` variable:
 
@@ -63,8 +63,8 @@ Please note: If you're not importing the whole planet, then the `.poly` file is 
 Therefore, when you only have a `.osm.pbf` file but not a `.poly` file, you should not enable automatic updates.
 
 ### Letting the container download the file
-[!IMPORTANT] 
-This section is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
+>[!IMPORTANT] 
+>This section is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
 
 
 It is also possible to let the container download files for you rather than mounting them in advance by using the `DOWNLOAD_PBF` and `DOWNLOAD_POLY` parameters:
@@ -79,8 +79,8 @@ docker run \
 ```
 
 ### Using an alternate style
-[!IMPORTANT] 
-This section is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
+>[!IMPORTANT] 
+>This section is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
 
 By default the container will use openstreetmap-carto if it is not specified. However, you can modify the style at run-time. Be aware you need the style mounted at `run` AND `import` as the Lua script needs to be run:
 
@@ -116,8 +116,8 @@ docker-compose up -d
 ```
 
 ### Manually using `docker run`
-[!NOTE]
-Rendering is done with [mod_tile](https://wiki.openstreetmap.org/wiki/Mod_tile) and apache2.    
+>[!NOTE]
+>Rendering is done with [mod_tile](https://wiki.openstreetmap.org/wiki/Mod_tile) and apache2.
 
 Run the server like this:
 
@@ -150,8 +150,8 @@ docker run \
 **If you do this, then make sure to also run the import with the `osm-tiles` volume to make sure that caching works properly across updates!**
 
 ### Enabling automatic updating (optional)
-[!IMPORTANT] 
-From this section on is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
+>[!IMPORTANT]
+>From this section on is orginal from the lezurex/openstreetmap-tile-server README.md and has not been tested with this fork. The docker image referenced does not exist at the time of writing. Replace with your local `cyclosm-tile-server` image if you want to try.
 
 Given that you've set up your import as described in the *Automatic updates* section during server setup, you can enable the updating process by setting the `UPDATES` variable while running your server as well:
 
