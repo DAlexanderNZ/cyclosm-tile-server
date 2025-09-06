@@ -17,4 +17,3 @@ volumes:
   osm-data:
     external: true
   osm-tiles:
-    external: true
